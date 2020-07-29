@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="com.bankerarea.mapper.IdeaMapper">
+		<insert id="insertIdea" parameterType="com.bankerarea.vo.IdeaVO">
+			INSERT INTO IDEA(project_name, short_description, category, banker_id)
+			VALUES(#{project_name}, #{short_description}, #{category}, #{banker_id})
+		</insert>
+		<insert id="insertGoods" parameterType="com.bankerarea.vo.GoodsVO">
+			INSERT INTO GOODS(goods_type, open_status, content, price, idea_seq)
+			VALUES(#{goods_type}, #{open_status}, #{content}, #{price}, #{idea_seq})
+		</insert>
+		
+		
+		<select id="getIdea" resultType="com.bankerarea.vo.IdeaVO" parameterType="int">
+			SELECT * FROM IDEA
+			WHERE idea_seq = #{idea_seq}
+		</select>
+		
+		<select id="getGoodsList" resultType="com.bankerarea.vo.GoodsVO" parameterType="int">
+			SELECT * FROM GOODS
+			WHERE idea_seq = #{idea_seq}
+		</select>
+		
+		<select id="getLikey_count" resultType="int" parameterType="int">
+			SELECT count(*) FROM LIKEY
+			WHERE idea_seq = #{idea_seq}
+		</select>
+		
+		<select id="getCurrentIdea_seq" resultType="int">
+			SELECT max(idea_seq) FROM IDEA
+		</select>
+		
+		<update id="updateIdea" parameterType="com.bankerarea.vo.IdeaVO">
+			UPDATE IDEA
+			SET project_name=#{project_name}, short_description=#{short_description},
+			category=#{category}, update_date=#{update_date}
+			WHERE idea_seq=#{idea_seq}
+		</update>
+		<!-- 
+		<update id="updateMotivation" parameterType="com.bankerarea.vo.GoodsVO">
+			UPDATE GOODS
+			SET open_status=#{open_status}, content=#{content}, price=#{price}
+			WHERE idea_seq=#{idea_seq} and goods_type='motivation'
+		</update>
+		<update id="updateNeed" parameterType="com.bankerarea.vo.GoodsVO">
+			UPDATE GOODS
+			SET open_status=#{open_status}, content=#{content}, price=#{price}
+			WHERE idea_seq=#{idea_seq} and goods_type='need'
+		</update>
+		<update id="updateStrategy" parameterType="com.bankerarea.vo.GoodsVO">
+			UPDATE GOODS
+			SET open_status=#{open_status}, content=#{content}, price=#{price}
+			WHERE idea_seq=#{idea_seq} and goods_type='strategy'
+		</update>
+		<update id="updateMarket_analysis" parameterType="com.bankerarea.vo.GoodsVO">
+			UPDATE GOODS
+			SET open_status=#{open_status}, content=#{content}, price=#{price}
+			WHERE idea_seq=#{idea_seq} and goods_type='market_analysis'
+		</update>
+		<update id="updateCompetitiveness" parameterType="com.bankerarea.vo.GoodsVO">
+			UPDATE GOODS
+			SET open_status=#{open_status}, content=#{content}, price=#{price}
+			WHERE idea_seq=#{idea_seq} and goods_type='competitiveness'
+		</update>
+		 -->
+		
+		
+		<select id="getIdeaList" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT * FROM IDEA
+		</select>
+		
+		<delete id="deleteIdea" parameterType="int">
+			DELETE FROM USERS
+			WHERE idea_seq = #{idea_seq}
+		</delete>
+		
+		<select id="getYourLikeyList" parameterType="String" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT IDEA.*
+			FROM IDEA, LIKEY
+			WHERE IDEA.idea_seq=LIKEY.idea_seq
+			AND LIKEY.id = #{id}
+		</select>
+		<select id="getYourPurchaseList" parameterType="String" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT distinct IDEA.*
+			FROM IDEA, PURCHASE, GOODS
+			WHERE IDEA.idea_seq=GOODS.idea_seq
+			AND PURCHASE.goods_seq = GOODS.goods_seq
+			AND PURCHASE.buyer_id = #{id};
+		</select>
+		
+		<select id="getMyIdeaList" parameterType="String" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT *
+			FROM IDEA
+			WHERE banker_id=#{banker_id}
+		</select>
+		
+		<select id="searchTypeIdeaList" parameterType="com.bankerarea.vo.SearchVO" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT * 
+			FROM IDEA
+			<if test="type.equals('searchWord')">
+			WHERE project_name like '%${keyword}%'
+			OR short_description like '%${keyword}%'
+			</if>
+			<if test="type.equals('category')">
+			WHERE category like '%${keyword}%'
+			</if>
+			<if test="type.equals('banker')">
+			WHERE banker_id like '%${keyword}%'
+			</if>
+		</select>
+		
+		<update id="increaseReadCnt" parameterType="int">
+			UPDATE IDEA
+			SET read_count = read_count + 1
+			WHERE IDEA_SEQ = #{idea_seq}
+		</update>
+		
+		<select id="likeyTop10" resultType="com.bankerarea.vo.IdeaVO">
+			SELECT IDEA.*, COUNT(LIKEY.idea_seq) AS likey_count
+			FROM IDEA LEFT OUTER JOIN LIKEY ON IDEA.idea_seq = LIKEY.idea_seq
+			GROUP BY IDEA.idea_seq
+			ORDER BY likey_count DESC, read_count DESC
+			LIMIT 12;
+		</select>
+		<select id="getTotalPriceOfIdea" parameterType="int" resultType="int">
+			SELECT SUM(price) FROM GOODS
+			WHERE idea_seq=#{idea_seq};
+		</select>
+		<update id="updateGoods" parameterType="com.bankerarea.vo.GoodsVO">
+			UPDATE GOODS
+			SET open_status=#{open_status}, content=#{content}, price=#{price}
+			WHERE goods_seq=#{goods_seq}
+		</update>
+		<select id="getGoods" resultType="com.bankerarea.vo.GoodsVO" parameterType="int">
+			SELECT *
+			FROM GOODS
+			WHERE GOODS_SEQ = #{goods_seq}
+		</select>
+	</mapper>

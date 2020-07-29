@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="com.bankerarea.mapper.PurchaseMapper">
+		<insert id="insertPurchase" parameterType="com.bankerarea.vo.PurchaseVO">
+			INSERT INTO PURCHASE(buyer_id, goods_seq)
+			VALUES(#{buyer_id}, #{goods_seq})
+		</insert>	
+		
+		<select id="getPurchaseList" resultType="com.bankerarea.vo.PurchaseVO" parameterType="String">
+			SELECT * FROM PURCHASE
+			WHERE buyer_id=#{buyer_id}
+		</select>
+			
+		<select id="isThisSoldIdea" resultType="Integer" parameterType="int">
+			SELECT DISTINCT(idea_seq) FROM PURCHASE, GOODS
+			WHERE PURCHASE.goods_seq = GOODS.goods_seq
+			AND idea_seq = #{idea_seq}
+		</select>
+	</mapper>

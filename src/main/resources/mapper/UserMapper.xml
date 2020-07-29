@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTDMapper3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="com.bankerarea.mapper.UserMapper">
+		<insert id="insertUser" parameterType="com.bankerarea.vo.UserVO">
+			INSERT INTO USERS(id, password, email)
+			VALUES(#{id}, #{password}, #{email})
+		</insert>
+		<select id="getUserList" resultType="com.bankerarea.vo.UserVO">
+			SELECT * FROM USERS
+			ORDER BY id
+		</select>
+		<select id="signInUser" resultType="com.bankerarea.vo.UserVO" parameterType="com.bankerarea.vo.UserVO">
+			SELECT * FROM USERS
+			WHERE id = #{id} AND password = #{password}
+		</select>
+		<select id="getUser" resultType="com.bankerarea.vo.UserVO" parameterType="String">
+			SELECT * FROM USERS
+			WHERE id = #{id};
+		</select>
+		<delete id="deleteUser" parameterType="com.bankerarea.vo.UserVO">
+			DELETE FROM USERS
+			WHERE id = #{id}
+		</delete>
+		<update id="updateUser" parameterType="com.bankerarea.vo.UserVO">
+			UPDATE USERS
+			SET password=#{password}, email=#{email}
+			WHERE id=#{id}
+		</update>
+	</mapper>
