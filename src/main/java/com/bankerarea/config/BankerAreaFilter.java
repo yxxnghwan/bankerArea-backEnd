@@ -116,5 +116,4 @@ public class BankerAreaFilter implements Filter {
 			}
 		}
 	}
-
 }
