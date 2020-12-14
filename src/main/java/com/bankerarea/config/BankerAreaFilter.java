@@ -82,19 +82,27 @@ public class BankerAreaFilter implements Filter {
 			} 
 			else {
 				System.out.println("쿠키 있음");
-				for(Cookie cookie : cookies) {
-					System.out.println("쿠키이름"+cookie.getName());
-					System.out.println("쿠키밸류"+cookie.getValue());
-				}
-				//String accessKey = null;
-				
-				String signInID = LoginManagementService.signInCheck(req, res);
-				
-				if(signInID == null) { // 만료된 경우 로그인에러처리
+				if(!unauth_allow_api.contains(URI)) {
+					for(Cookie cookie : cookies) {
+						System.out.println("쿠키이름"+cookie.getName());
+						System.out.println("쿠키밸류"+cookie.getValue());
+					}
+					//String accessKey = null;
+					
+					String signInID = LoginManagementService.signInCheck(req, res);
+					
+					if(signInID == null) { // 만료된 경우 로그인에러처리
+						System.out.println("[BankerArea Service Filter] 비로그인 사용자에게 허용이 안된 API 입니다.");
+						res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					} else { // 로그인성공
+						System.out.println("[BankerArea Service Filter] (사용자)" + signInID + "검증완료");
+						chain.doFilter(request, response);
+					}
 					System.out.println("[BankerArea Service Filter] 비로그인 사용자에게 허용이 안된 API 입니다.");
 					res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-				} else { // 로그인성공
-					System.out.println("[BankerArea Service Filter] (사용자)" + signInID + "검증완료");
+				}
+				else {
+					System.out.println("[BankerArea Service Filter] 비로그인 사용자에게도 허용된 API 입니다.");
 					chain.doFilter(request, response);
 				}
 				
